@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
         hostname: 'fal.media',
       },
     ],
+    unoptimized: true,
   },
 };
 

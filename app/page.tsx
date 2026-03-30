@@ -8,22 +8,41 @@ export default function SubForge() {
   const [power, setPower] = useState(0);
   const [loading, setLoading] = useState(false);
   const [shareMsg, setShareMsg] = useState('');
+  const [error, setError] = useState('');
+
+  const buildPrompt = (level: number): string => {
+    const base = `ultra-detailed 8k hyperrealistic kink customizer mechanics view for the Gay AI Agent app, holographic scene of a dominant leather daddy flogging and spanking a bound twink sub, the twink caged yet leaking as the daddy alternates power in his hole, power-exchange meter filling with each slap, sweat and tears of pleasure, (BDSM power gay mechanics:1.6), dark leather club UI neon, hyperrealistic anatomy, 8k`;
+    let prompt = base;
+    if (level >= 5) prompt += ', glowing chains wrapping limbs, shiny nipple clamps, heavy ball stretchers';
+    if (level >= 8) prompt += ', thick glowing chains, extreme ball stretchers, visible tears of pleasure';
+    if (level >= 10) prompt += ', maximum power-exchange meter glowing red, full submission, leaking profusely';
+    return prompt;
+  };
+
+  const generateImage = async (prompt: string): Promise<string> => {
+    const result = await puter.ai.image.generate({
+      model: 'stable-diffusion-3-medium',
+      prompt,
+    });
+    if (result.image instanceof Blob) {
+      return URL.createObjectURL(result.image);
+    }
+    return result.image as string;
+  };
 
   const generate = async (level: number) => {
     setLoading(true);
+    setError('');
     try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ submissionLevel: level }),
+      const url = await generateImage(buildPrompt(level));
+      setImageUrl((prev) => {
+        if (prev.startsWith('blob:')) URL.revokeObjectURL(prev);
+        return url;
       });
-      const data = await res.json();
-      if (data.imageUrl) {
-        setImageUrl(data.imageUrl);
-        setPower((prev) => Math.min(100, prev + 15));
-      }
+      setPower((prev) => Math.min(100, prev + 15));
     } catch (err) {
       console.error(err);
+      setError('Image generation failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -34,6 +53,13 @@ export default function SubForge() {
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submission]);
+
+  useEffect(() => {
+    return () => {
+      if (imageUrl.startsWith('blob:')) URL.revokeObjectURL(imageUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleShare = () => {
     const text = `My Submission Level ${submission} scene in SubForge AI #GayKinkAI #SubForge`;
@@ -98,6 +124,12 @@ export default function SubForge() {
             </div>
           ) : null}
         </div>
+
+        {error && (
+          <div className="border-2 border-red-500/60 rounded-xl p-4 mb-6 bg-red-500/10 text-center text-red-400 text-sm font-bold tracking-wide">
+            ⚠️ {error}
+          </div>
+        )}
 
         {/* Controls grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
