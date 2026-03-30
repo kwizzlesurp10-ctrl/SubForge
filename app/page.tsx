@@ -1,6 +1,28 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+
+const PUTER_MODELS = {
+  sd3: 'stabilityai/stable-diffusion-3-medium',
+  sdxl: 'stabilityai/stable-diffusion-xl-base-1.0',
+} as const;
+
+type PuterModel = keyof typeof PUTER_MODELS;
+
+const BASE_PROMPT =
+  `ultra-detailed 8k hyperrealistic kink customizer mechanics view for the Gay AI Agent app, ` +
+  `holographic scene of a dominant leather daddy flogging and spanking a bound twink sub, ` +
+  `the twink caged yet leaking as the daddy alternates power in his hole, power-exchange meter ` +
+  `filling with each slap, sweat and tears of pleasure, (BDSM power gay mechanics:1.6), ` +
+  `dark leather club UI neon, hyperrealistic anatomy, 8k`;
+
+function buildPrompt(level: number): string {
+  let prompt = BASE_PROMPT;
+  if (level >= 5) prompt += ', glowing chains wrapping limbs, shiny nipple clamps, heavy ball stretchers';
+  if (level >= 8) prompt += ', thick glowing chains, extreme ball stretchers, visible tears of pleasure';
+  if (level >= 10) prompt += ', maximum power-exchange meter glowing red, full submission, leaking profusely';
+  return prompt;
+}
 
 export default function SubForge() {
   const [submission, setSubmission] = useState(5);
@@ -9,23 +31,41 @@ export default function SubForge() {
   const [loading, setLoading] = useState(false);
   const [shareMsg, setShareMsg] = useState('');
   const [error, setError] = useState('');
+  const [puterModel, setPuterModel] = useState<PuterModel>('sd3');
+  const [activeEngine, setActiveEngine] = useState('');
 
-  const generate = async (level: number) => {
+  const generate = useCallback(async (level: number) => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ submissionLevel: level }),
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        throw new Error(data.error || 'Generation failed');
+      let newImageUrl: string;
+
+      // Primary: client-side generation via Puter (SD3 or SDXL — no API key)
+      if (typeof window !== 'undefined' && window.puter?.ai?.txt2img) {
+        const imgEl = await window.puter.ai.txt2img(buildPrompt(level), {
+          model: PUTER_MODELS[puterModel],
+          negative_prompt: 'ugly, deformed, blurry, low quality, watermark, text, logo',
+        });
+        newImageUrl = imgEl.src;
+        setActiveEngine(puterModel === 'sd3' ? 'PUTER SD3' : 'PUTER SDXL');
+      } else {
+        // Fallback: server-side FAL.ai route (requires FAL_KEY env var)
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ submissionLevel: level }),
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) {
+          throw new Error(data.error || 'Generation failed');
+        }
+        newImageUrl = data.imageUrl;
+        setActiveEngine('FAL.AI');
       }
+
       setImageUrl((prev) => {
         if (prev.startsWith('blob:')) URL.revokeObjectURL(prev);
-        return data.imageUrl;
+        return newImageUrl;
       });
       setPower((prev) => Math.min(100, prev + 15));
     } catch (err) {
@@ -34,13 +74,12 @@ export default function SubForge() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [puterModel]);
 
   useEffect(() => {
     const timer = setTimeout(() => generate(submission), 800);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submission]);
+  }, [submission, generate]);
 
   useEffect(() => {
     return () => {
@@ -68,7 +107,7 @@ export default function SubForge() {
         SUBFORGE AI
       </h1>
       <p className="text-center text-xs tracking-[0.5em] text-lime-300/60 mb-8 uppercase">
-        Serverless Kink Customizer v1.0 &bull; Powered by fal.ai
+        Serverless Kink Customizer v1.0 &bull; Puter SD3 / SDXL + fal.ai
       </p>
 
       <div className="max-w-4xl mx-auto">
@@ -84,7 +123,9 @@ export default function SubForge() {
             <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/70">
               <div className="text-center">
                 <div className="text-2xl font-bold neon-text animate-pulse">GENERATING 8K HYPERREAL...</div>
-                <div className="text-sm mt-2 text-lime-300">SUBMISSION LEVEL: {submission}</div>
+                <div className="text-sm mt-2 text-lime-300">
+                  {puterModel === 'sd3' ? 'PUTER SD3' : 'PUTER SDXL'} &bull; SUBMISSION LEVEL: {submission}
+                </div>
                 <div className="mt-4 flex gap-2 justify-center">
                   {[...Array(5)].map((_, i) => (
                     <div key={i} className="w-2 h-8 bg-lime-400 animate-pulse" style={{ animationDelay: `${i * 0.1}s` }} />
@@ -168,6 +209,34 @@ export default function SubForge() {
               Fills with each gen. At 100% — full surrender unlocked.
             </p>
           </div>
+        </div>
+
+        {/* Puter model selector */}
+        <div className="neon-border rounded-xl p-4 mb-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs tracking-widest uppercase text-lime-300/70 flex-shrink-0">AI Engine:</span>
+            {(Object.keys(PUTER_MODELS) as PuterModel[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => setPuterModel(m)}
+                className={`px-4 py-1 text-xs font-bold rounded-full border transition-all ${
+                  puterModel === m
+                    ? 'border-lime-400 bg-lime-400 text-black'
+                    : 'border-lime-400/40 text-lime-400/60 hover:border-lime-400/70 hover:text-lime-400'
+                }`}
+              >
+                {m === 'sd3' ? 'SD3 (Stable Diffusion 3)' : 'SDXL (Stable Diffusion XL)'}
+              </button>
+            ))}
+            {activeEngine && (
+              <span className="ml-auto text-xs text-lime-300/40 tracking-widest">
+                LAST: {activeEngine}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-lime-300/40 mt-2">
+            Powered by Puter — 100% client-side, no API key required. Falls back to fal.ai if unavailable.
+          </p>
         </div>
 
         {/* Action buttons */}
