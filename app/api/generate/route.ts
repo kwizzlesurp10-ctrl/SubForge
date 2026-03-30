@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       dynamicPrompt += ', maximum power-exchange meter glowing red, full submission, leaking profusely';
     }
 
-    const result = await fal.subscribe('fal-ai/flux-pro', {
+    const result = await fal.subscribe('fal-ai/flux-pro/v1.1', {
       input: {
         prompt: dynamicPrompt,
         image_size: 'square_hd',
