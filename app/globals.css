@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --neon-lime: #a3e635;
+  --neon-pink: #ec4899;
+  --neon-purple: #a855f7;
+}
+
+body {
+  background: #000;
+  color: #a3e635;
+  font-family: 'Courier New', monospace;
+}
+
+.neon-text {
+  color: var(--neon-lime);
+  text-shadow:
+    0 0 10px var(--neon-lime),
+    0 0 20px var(--neon-lime),
+    0 0 40px var(--neon-lime);
+}
+
+.neon-border {
+  border: 2px solid var(--neon-lime);
+  box-shadow:
+    0 0 10px var(--neon-lime),
+    inset 0 0 10px rgba(163, 230, 53, 0.1);
+}
+
+.power-bar {
+  background: linear-gradient(90deg, var(--neon-lime), var(--neon-pink));
+  box-shadow: 0 0 15px var(--neon-lime);
+  transition: width 0.5s ease;
+}
+
+.generate-btn {
+  background: var(--neon-lime);
+  color: #000;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  transition: all 0.2s ease;
+}
+
+.generate-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px var(--neon-lime);
+}
+
+.generate-btn.maxed {
+  background: var(--neon-pink);
+  box-shadow: 0 0 30px var(--neon-pink);
+}
