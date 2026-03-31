@@ -1,7 +1,10 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { PUTER_MODELS, buildPrompt, type PuterModel } from '../lib/puter-generate';
+import { PUTER_MODELS, buildPrompt, type PuterModel, type PromptStyle } from '../lib/puter-generate';
+import { FalButton, PuterButton, FluxButton } from '../components/AIButtons';
+
+type Provider = 'puter' | 'fal' | 'flux';
 
 const clampPower = (value: number) => Math.min(100, Math.max(0, value));
 
@@ -20,6 +23,8 @@ export default function SubForge() {
   const [shareMsg, setShareMsg] = useState('');
   const [error, setError] = useState('');
   const [puterModel, setPuterModel] = useState<PuterModel>('sd3');
+  const [selectedProvider, setSelectedProvider] = useState<Provider>('puter');
+  const [promptStyle, setPromptStyle] = useState<PromptStyle>('bdsm');
   const [activeEngine, setActiveEngine] = useState('');
 
   const generate = useCallback(async (level: number) => {
@@ -28,27 +33,27 @@ export default function SubForge() {
     try {
       let newImageUrl: string;
 
-      // Primary: client-side generation via Puter (SD3 or SDXL — no API key)
-      if (typeof window !== 'undefined' && window.puter?.ai?.txt2img) {
-        const imgEl = await window.puter.ai.txt2img(buildPrompt(level), {
+      // Primary logic based on selectedProvider
+      if (selectedProvider === 'puter' && typeof window !== 'undefined' && window.puter?.ai?.txt2img) {
+        const imgEl = await window.puter.ai.txt2img(buildPrompt(level, promptStyle), {
           model: PUTER_MODELS[puterModel],
           negative_prompt: 'ugly, deformed, blurry, low quality, watermark, text, logo',
         });
         newImageUrl = imgEl.src;
         setActiveEngine(puterModel === 'sd3' ? 'PUTER SD3' : 'PUTER SDXL');
       } else {
-        // Fallback: server-side FAL.ai route (requires FAL_KEY env var)
+        // Fallback to FAL.ai (either forced or if Puter unavailable)
         const res = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ submissionLevel: level }),
+          body: JSON.stringify({ submissionLevel: level, style: promptStyle }),
         });
         const data = await res.json();
         if (!res.ok || data.error) {
           throw new Error(data.error || 'Generation failed');
         }
         newImageUrl = data.imageUrl;
-        setActiveEngine('FAL.AI');
+        setActiveEngine(selectedProvider === 'flux' ? 'FAL.AI FLUX' : 'FAL.AI');
       }
 
       setImageUrl((prev) => {
@@ -66,7 +71,7 @@ export default function SubForge() {
     } finally {
       setLoading(false);
     }
-  }, [puterModel]);
+  }, [puterModel, selectedProvider, promptStyle]);
 
   useEffect(() => {
     const timer = setTimeout(() => generate(submission), 800);
@@ -223,6 +228,49 @@ export default function SubForge() {
               Fills with each gen. At 100% — full surrender unlocked.
             </p>
           </div>
+        </div>
+
+        {/* AI Provider Selection */}
+        <div className="neon-border rounded-xl p-4 mb-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs tracking-widest uppercase text-lime-300/70 flex-shrink-0">AI Provider:</span>
+            <PuterButton onClick={() => setSelectedProvider('puter')} active={selectedProvider === 'puter'} />
+            <FalButton onClick={() => setSelectedProvider('fal')} active={selectedProvider === 'fal'} />
+            <FluxButton onClick={() => setSelectedProvider('flux')} active={selectedProvider === 'flux'} />
+          </div>
+          <p className="text-xs text-lime-300/40 mt-2">
+            Puter uses client-side SD3/SDXL. Fal and Flux use server-side Flux Pro (requires API key).
+          </p>
+        </div>
+
+        {/* Prompt Style Selection */}
+        <div className="neon-border rounded-xl p-4 mb-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs tracking-widest uppercase text-lime-300/70 flex-shrink-0">Prompt Style:</span>
+            <button
+              onClick={() => setPromptStyle('bdsm')}
+              className={`px-4 py-1 text-xs font-bold rounded-full border transition-all ${
+                promptStyle === 'bdsm'
+                  ? 'border-lime-400 bg-lime-400 text-black'
+                  : 'border-lime-400/40 text-lime-400/60 hover:border-lime-400/70 hover:text-lime-400'
+              }`}
+            >
+              ORIGINAL (BDSM)
+            </button>
+            <button
+              onClick={() => setPromptStyle('classical')}
+              className={`px-4 py-1 text-xs font-bold rounded-full border transition-all ${
+                promptStyle === 'classical'
+                  ? 'border-lime-400 bg-lime-400 text-black'
+                  : 'border-lime-400/40 text-lime-400/60 hover:border-lime-400/70 hover:text-lime-400'
+              }`}
+            >
+              CLASSICAL ART STUDIO
+            </button>
+          </div>
+          <p className="text-xs text-lime-300/40 mt-2">
+            Switch between the core SubForge kink experience and classical anatomical studies.
+          </p>
         </div>
 
         {/* Puter model selector */}
