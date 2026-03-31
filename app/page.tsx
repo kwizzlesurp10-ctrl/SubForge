@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { PUTER_MODELS, buildPrompt, type PuterModel, type PromptStyle } from '../lib/puter-generate';
+import { PUTER_MODELS, NEGATIVE_PROMPT, buildPrompt, type PuterModel, type PromptStyle } from '../lib/puter-generate';
 import { FalButton, PuterButton, FluxButton } from '../components/AIButtons';
 
 type Provider = 'puter' | 'fal' | 'flux';

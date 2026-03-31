@@ -21,17 +21,12 @@ async function main() {
     });
 
     const imageData = result.images[0];
-    if (imageData && imageData.url) {
-      // In a real environment, we'd fetch the URL if we need the buffer.
-      // For this script, we log the success and the URL.
+    if (imageData) {
       console.log('Image generated successfully!');
-      console.log('URL:', imageData.url);
-      
-      // Attempting to fetch binary data to save locally as output.png
+
+      // Write the image from the base64 data provided by the SDK
       try {
-        const response = await fetch(imageData.url);
-        const arrayBuffer = await response.arrayBuffer();
-        fs.writeFileSync('output.png', Buffer.from(arrayBuffer));
+        fs.writeFileSync('output.png', Buffer.from(imageData.base64, 'base64'));
         console.log('Image saved to output.png');
       } catch (e) {
         console.warn('Could not save file locally, but generation succeeded.');

@@ -22,7 +22,6 @@ export async function POST(req: Request) {
     const result = (await fal.subscribe('fal-ai/flux-pro/v1.1', {
       input: {
         prompt: dynamicPrompt,
-        negative_prompt: NEGATIVE_PROMPT,
         image_size: 'square_hd',
         num_images: 1,
       },

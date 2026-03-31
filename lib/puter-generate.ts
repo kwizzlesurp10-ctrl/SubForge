@@ -7,6 +7,9 @@ export type PuterModel = keyof typeof PUTER_MODELS;
 
 export type PromptStyle = 'bdsm' | 'classical';
 
+export const NEGATIVE_PROMPT =
+  'deformed, blurry, low quality, cartoon, 3d render, extra limbs, bad hands, deformed anatomy';
+
 export const PROMPTS: Record<PromptStyle, string> = {
   bdsm: `ultra-detailed 8k hyperrealistic kink customizer screen for Gay AI Agent app, ` +
     `holographic preview of a ripped twink edging a massive bear daddy's throbbing cock ` +
@@ -33,3 +36,6 @@ export function buildPrompt(level: number, style: PromptStyle = 'bdsm'): string 
   
   return prompt;
 }
+
+/** Alias kept for backward compatibility with tests. */
+export const BASE_PROMPT = PROMPTS.bdsm;
