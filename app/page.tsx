@@ -3,10 +3,19 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { PUTER_MODELS, buildPrompt, type PuterModel } from '../lib/puter-generate';
 
+const clampPower = (value: number) => Math.min(100, Math.max(0, value));
+
 export default function SubForge() {
   const [submission, setSubmission] = useState(5);
   const [imageUrl, setImageUrl] = useState('');
-  const [power, setPower] = useState(0);
+  const [power, setPower] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('subforge_power');
+      const parsed = saved !== null ? Number(saved) : 0;
+      return Number.isFinite(parsed) ? clampPower(parsed) : 0;
+    }
+    return 0;
+  });
   const [loading, setLoading] = useState(false);
   const [shareMsg, setShareMsg] = useState('');
   const [error, setError] = useState('');
@@ -46,7 +55,11 @@ export default function SubForge() {
         if (prev.startsWith('blob:')) URL.revokeObjectURL(prev);
         return newImageUrl;
       });
-      setPower((prev) => Math.min(100, prev + 15));
+      setPower((prev) => {
+        const next = clampPower(prev + 15);
+        localStorage.setItem('subforge_power', String(next));
+        return next;
+      });
     } catch (err) {
       console.error(err);
       setError('Image generation failed. Please try again.');
@@ -69,10 +82,32 @@ export default function SubForge() {
 
   const handleShare = () => {
     const text = `My Submission Level ${submission} scene in SubForge AI #GayKinkAI #SubForge`;
-    navigator.clipboard.writeText(text).then(() => {
-      setShareMsg('Copied!');
-      setTimeout(() => setShareMsg(''), 2000);
-    });
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        setShareMsg('Copied!');
+        setTimeout(() => setShareMsg(''), 2000);
+      }).catch(() => {
+        setShareMsg('Copy failed');
+        setTimeout(() => setShareMsg(''), 2000);
+      });
+    } else {
+      // Fallback for browsers without Clipboard API
+      try {
+        const el = document.createElement('textarea');
+        el.value = text;
+        el.style.position = 'fixed';
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        setShareMsg('Copied!');
+        setTimeout(() => setShareMsg(''), 2000);
+      } catch {
+        setShareMsg('Copy failed');
+        setTimeout(() => setShareMsg(''), 2000);
+      }
+    }
   };
 
   return (
