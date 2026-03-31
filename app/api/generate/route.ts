@@ -17,13 +17,13 @@ export async function POST(req: Request) {
     let dynamicPrompt = BASE_PROMPT;
 
     if (submissionLevel >= 5) {
-      dynamicPrompt += ', glowing chains wrapping limbs, shiny nipple clamps, heavy ball stretchers';
+      dynamicPrompt += ', chastity cage glowing locked, tease intensity maxed, edging duration extended to 90min';
     }
     if (submissionLevel >= 8) {
-      dynamicPrompt += ', thick glowing chains, extreme ball stretchers, visible tears of pleasure';
+      dynamicPrompt += ', ruined orgasm sequence activated, continuous denial loop, visible desperation and tears';
     }
     if (submissionLevel >= 10) {
-      dynamicPrompt += ', maximum power-exchange meter glowing red, full submission, leaking profusely';
+      dynamicPrompt += ', maximum denial timer glowing red, full orgasm lock, complete submission, leaking uncontrollably';
     }
 
     const result = await fal.subscribe('fal-ai/flux-pro/v1.1', {

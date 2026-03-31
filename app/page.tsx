@@ -162,10 +162,10 @@ export default function SubForge() {
             </div>
             <p className="text-xs text-lime-300/80 mt-3 border-t border-lime-400/20 pt-3">
               {submission >= 8
-                ? '⚠️ MAX: chains + clamps + stretchers + full power exchange'
+                ? '⚠️ MAX: extreme denial + ruined orgasms + full submission'
                 : submission >= 5
-                ? '🔗 MID: glowing restraints + nipple clamps'
-                : '🌚 ENTRY: leather + light restraints'}
+                ? '🔒 MID: chastity cage + denial lock activated'
+                : '🌚 ENTRY: light edging + cock-ring UI'}
             </p>
           </div>
 

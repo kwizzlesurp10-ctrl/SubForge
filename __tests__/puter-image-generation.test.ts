@@ -13,29 +13,29 @@ describe('buildPrompt', () => {
   it('appends mid-tier modifiers at level 5', () => {
     const prompt = buildPrompt(5);
     expect(prompt).toContain(BASE_PROMPT);
-    expect(prompt).toContain('glowing chains wrapping limbs');
-    expect(prompt).toContain('shiny nipple clamps');
-    expect(prompt).toContain('heavy ball stretchers');
+    expect(prompt).toContain('chastity cage glowing locked');
+    expect(prompt).toContain('tease intensity maxed');
+    expect(prompt).toContain('edging duration extended to 90min');
     // Level-8 modifiers must NOT appear yet
-    expect(prompt).not.toContain('thick glowing chains');
+    expect(prompt).not.toContain('ruined orgasm sequence activated');
   });
 
   it('appends high-tier modifiers at level 8', () => {
     const prompt = buildPrompt(8);
-    expect(prompt).toContain('thick glowing chains');
-    expect(prompt).toContain('extreme ball stretchers');
-    expect(prompt).toContain('visible tears of pleasure');
+    expect(prompt).toContain('ruined orgasm sequence activated');
+    expect(prompt).toContain('continuous denial loop');
+    expect(prompt).toContain('visible desperation and tears');
     // Level-10 modifiers must NOT appear yet
-    expect(prompt).not.toContain('maximum power-exchange meter glowing red');
+    expect(prompt).not.toContain('maximum denial timer glowing red');
   });
 
   it('appends all modifiers at level 10 (max)', () => {
     const prompt = buildPrompt(10);
-    expect(prompt).toContain('glowing chains wrapping limbs');
-    expect(prompt).toContain('thick glowing chains');
-    expect(prompt).toContain('maximum power-exchange meter glowing red');
-    expect(prompt).toContain('full submission');
-    expect(prompt).toContain('leaking profusely');
+    expect(prompt).toContain('chastity cage glowing locked');
+    expect(prompt).toContain('ruined orgasm sequence activated');
+    expect(prompt).toContain('maximum denial timer glowing red');
+    expect(prompt).toContain('full orgasm lock');
+    expect(prompt).toContain('leaking uncontrollably');
   });
 });
 
@@ -110,7 +110,7 @@ describe('Puter txt2img integration', () => {
     );
     expect(imgEl.src).toBe(FAKE_BLOB_URL);
     // Level-10 prompt must include max-tier modifiers
-    expect(prompt).toContain('maximum power-exchange meter glowing red');
+    expect(prompt).toContain('maximum denial timer glowing red');
   });
 
   it('returns an HTMLImageElement-like object with a src blob URL', async () => {
