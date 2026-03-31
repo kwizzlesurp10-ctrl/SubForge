@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { PUTER_MODELS, buildPrompt, type PuterModel } from '../lib/puter-generate';
+import { PUTER_MODELS, NEGATIVE_PROMPT, buildPrompt, type PuterModel } from '../lib/puter-generate';
 
 export default function SubForge() {
   const [submission, setSubmission] = useState(5);
@@ -23,7 +23,7 @@ export default function SubForge() {
       if (typeof window !== 'undefined' && window.puter?.ai?.txt2img) {
         const imgEl = await window.puter.ai.txt2img(buildPrompt(level), {
           model: PUTER_MODELS[puterModel],
-          negative_prompt: 'ugly, deformed, blurry, low quality, watermark, text, logo',
+          negative_prompt: NEGATIVE_PROMPT,
         });
         newImageUrl = imgEl.src;
         setActiveEngine(puterModel === 'sd3' ? 'PUTER SD3' : 'PUTER SDXL');

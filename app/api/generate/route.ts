@@ -1,8 +1,5 @@
 import { fal } from '@fal-ai/client';
-
-const BASE_PROMPT = `ultra-detailed 8k hyperrealistic kink customizer screen for Gay AI Agent app, holographic preview of a ripped twink edging a massive bear daddy’s throbbing 12-inch cock with a glowing cock-ring UI slider set to “Edging Duration: 45min”, precum dripping endlessly while denial toggle “Orgasm Lock: ON” visibly prevents climax, daddy’s face desperate and moaning, side sliders for “Chastity Level”, “Tease Intensity”, “Ruined Orgasm Chance” actively spawning vibrating toys and holographic hands stroking without release, sweat-soaked bodies, (edging denial gay mechanics:1.6), neon control panel glow, 8k
-
-Negatives: censored, blurred genitals, deformed anatomy, low quality, text watermark, female, underage, clothing on main subjects, soft lighting, cartoon, 3d render, extra limbs, bad hands, static scene`;
+import { buildPrompt, NEGATIVE_PROMPT } from '../../lib/puter-generate';
 
 export async function POST(req: Request) {
   try {
@@ -14,21 +11,12 @@ export async function POST(req: Request) {
 
     fal.config({ credentials: process.env.FAL_KEY });
 
-    let dynamicPrompt = BASE_PROMPT;
-
-    if (submissionLevel >= 5) {
-      dynamicPrompt += ', chastity cage glowing locked, tease intensity maxed, edging duration extended to 90min';
-    }
-    if (submissionLevel >= 8) {
-      dynamicPrompt += ', ruined orgasm sequence activated, continuous denial loop, visible desperation and tears';
-    }
-    if (submissionLevel >= 10) {
-      dynamicPrompt += ', maximum denial timer glowing red, full orgasm lock, complete submission, leaking uncontrollably';
-    }
+    const dynamicPrompt = buildPrompt(submissionLevel);
 
     const result = await fal.subscribe('fal-ai/flux-pro/v1.1', {
       input: {
         prompt: dynamicPrompt,
+        negative_prompt: NEGATIVE_PROMPT,
         image_size: 'square_hd',
         num_inference_steps: 28,
         num_images: 1,
