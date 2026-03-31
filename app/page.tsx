@@ -37,7 +37,7 @@ export default function SubForge() {
       if (selectedProvider === 'puter' && typeof window !== 'undefined' && window.puter?.ai?.txt2img) {
         const imgEl = await window.puter.ai.txt2img(buildPrompt(level, promptStyle), {
           model: PUTER_MODELS[puterModel],
-          negative_prompt: 'ugly, deformed, blurry, low quality, watermark, text, logo',
+          negative_prompt: NEGATIVE_PROMPT,
         });
         newImageUrl = imgEl.src;
         setActiveEngine(puterModel === 'sd3' ? 'PUTER SD3' : 'PUTER SDXL');
