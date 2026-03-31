@@ -11,14 +11,19 @@ const clampPower = (value: number) => Math.min(100, Math.max(0, value));
 export default function SubForge() {
   const [submission, setSubmission] = useState(5);
   const [imageUrl, setImageUrl] = useState('');
-  const [power, setPower] = useState(() => {
+  const [power, setPower] = useState(0);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('subforge_power');
-      const parsed = saved !== null ? Number(saved) : 0;
-      return Number.isFinite(parsed) ? clampPower(parsed) : 0;
+      if (saved !== null) {
+        const parsed = Number(saved);
+        if (Number.isFinite(parsed)) {
+          setPower(clampPower(parsed));
+        }
+      }
     }
-    return 0;
-  });
+  }, []);
   const [loading, setLoading] = useState(false);
   const [shareMsg, setShareMsg] = useState('');
   const [error, setError] = useState('');
@@ -136,7 +141,7 @@ export default function SubForge() {
           <div className="flex flex-col items-center gap-2 mt-4">
             <div className="h-px w-24 bg-gradient-to-r from-transparent via-lime-400/60 to-transparent" />
             <p className="text-xs uppercase tracking-[0.5em] text-lime-300/40 font-bold">
-              Autonomous Kink Interface v2.1 // Neural Forge Ready
+              Autonomous Kink Interface v2.2 // Neural Forge Ready
             </p>
             <div className="h-px w-24 bg-gradient-to-r from-transparent via-lime-400/60 to-transparent" />
           </div>
