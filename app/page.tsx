@@ -136,7 +136,7 @@ export default function SubForge() {
           <div className="flex flex-col items-center gap-2 mt-4">
             <div className="h-px w-24 bg-gradient-to-r from-transparent via-lime-400/60 to-transparent" />
             <p className="text-xs uppercase tracking-[0.5em] text-lime-300/40 font-bold">
-              Autonomous Kink Interface v2.0 // Neural Forge Ready
+              Autonomous Kink Interface v2.1 // Neural Forge Ready
             </p>
             <div className="h-px w-24 bg-gradient-to-r from-transparent via-lime-400/60 to-transparent" />
           </div>
