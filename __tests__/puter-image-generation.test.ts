@@ -101,7 +101,6 @@ describe('Puter txt2img integration', () => {
 
   afterEach(() => {
     // Clean up so other tests are not affected
-    // @ts-expect-error – deleting a non-optional property for cleanup
     delete window.puter;
     vi.restoreAllMocks();
   });
