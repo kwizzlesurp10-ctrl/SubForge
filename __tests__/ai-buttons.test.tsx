@@ -30,12 +30,12 @@ describe('AIButtons', () => {
   it('buttons have active class when active prop is true', () => {
     render(<FalButton onClick={() => {}} active={true} />);
     const button = screen.getByTestId('fal-button');
-    expect(button.className).toContain('border-lime-400 bg-lime-400 text-black');
+    expect(button.className).toContain('border-lime-400 bg-lime-400/10 text-lime-400');
   });
 
   it('buttons have inactive class when active prop is false', () => {
     render(<FalButton onClick={() => {}} active={false} />);
     const button = screen.getByTestId('fal-button');
-    expect(button.className).toContain('border-lime-400/40 text-lime-400/60');
+    expect(button.className).toContain('border-white/10 text-white/40');
   });
 });
